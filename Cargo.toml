@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 build = "build.rs"
 description = "Local GOP-level replacement and remuxing tool for H.264/HEVC delivery streams"
+license = "MIT"
 publish = false
 
 [dependencies]
