@@ -120,13 +120,11 @@ fn copy_runtime_dlls(bin_dir: &Path) {
         "postproc-",
     ];
 
-    let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") else {
-        return;
-    };
-    let profile = env::var("PROFILE").unwrap_or_else(|_| "release".to_owned());
-    let target_dir = PathBuf::from(manifest_dir).join("target").join(profile);
-    let _ = fs::create_dir_all(&target_dir);
-    remove_ffmpeg_dlls(&target_dir, FFMPEG_DLL_PREFIXES);
+    // OUT_DIR also accounts for CARGO_TARGET_DIR and explicit --target builds.
+    let out_dir = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo sets OUT_DIR"));
+    let target_dir = out_dir.ancestors().nth(3).expect("Cargo build directory");
+    fs::create_dir_all(target_dir).expect("create runtime DLL directory");
+    remove_ffmpeg_dlls(target_dir, FFMPEG_DLL_PREFIXES);
 
     let Ok(entries) = fs::read_dir(bin_dir) else {
         return;
@@ -148,7 +146,9 @@ fn copy_runtime_dlls(bin_dir: &Path) {
                 })
         {
             let target = target_dir.join(path.file_name().expect("dll file name"));
-            let _ = fs::copy(&path, target);
+            fs::copy(&path, &target).unwrap_or_else(|error| {
+                panic!("failed to copy runtime DLL {}: {error}", target.display())
+            });
         }
     }
 }

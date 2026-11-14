@@ -595,7 +595,10 @@ mux_cleanup:
     }
     if (!(output_format->oformat->flags & AVFMT_NOFILE)) {
         result->bytes_written = avio_tell(output_format->pb);
-        avio_closep(&output_format->pb);
+        int close_ret = avio_closep(&output_format->pb);
+        if (ret >= 0 && close_ret < 0) {
+            ret = close_ret;
+        }
     }
     free(stream_map);
     free(states);

@@ -12,6 +12,29 @@ use crate::{
 
 pub(crate) fn try_handle(args: &[String]) -> Option<eframe::Result<()>> {
     match args.first().map(String::as_str) {
+        Some("--help" | "-h") => {
+            println!(
+                "GOP Composer {}\n\
+                Usage: gop-composer [--debug] (GUI)\n\
+                --probe <video>\n\
+                --decode-frame <video> <frame> <out.rgba>\n\
+                --decode-window <video> <start-frame> <count>\n\
+                --export-range <input> <start-packet> <end-packet> <mp4|raw> <output>\n\
+                --export-ranges <input> <start-end,start-end> <mp4|raw> <output>\n\
+                --export-gops <input> <gop-list> <mp4|raw> <output>\n\
+                --export-gops-ordered <input> <gop-list> <mp4|raw> <output> [--generate-pts] [--pts-step=N]\n\
+                --timecode-map <main-video> <replacement-video>\n\
+                --bench-preview-session <input> <gop-number> <window-count> <repeats>\n\
+                --version\n\
+                GOP numbers are 1-based; frame and packet indices are 0-based.",
+                env!("CARGO_PKG_VERSION")
+            );
+            Some(Ok(()))
+        }
+        Some("--version" | "-V") => {
+            println!("GOP Composer {}", env!("CARGO_PKG_VERSION"));
+            Some(Ok(()))
+        }
         Some("--probe") => Some(handle_probe(args)),
         Some("--decode-frame") => Some(handle_decode_frame(args)),
         Some("--decode-window") => Some(handle_decode_window(args)),
@@ -21,7 +44,11 @@ pub(crate) fn try_handle(args: &[String]) -> Option<eframe::Result<()>> {
         Some("--export-gops-ordered") => Some(handle_export_gops_ordered(args)),
         Some("--timecode-map") => Some(handle_timecode_map(args)),
         Some("--bench-preview-session") => Some(handle_preview_bench(args)),
-        _ => None,
+        None | Some("--debug") => None,
+        Some(other) => {
+            eprintln!("Unknown command: {other}. Use --help for usage.");
+            std::process::exit(2);
+        }
     }
 }
 

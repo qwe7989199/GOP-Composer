@@ -10,6 +10,13 @@ change should not require re-encoding the entire program.
 
 [中文说明](README.zh-CN.md)
 
+## Download
+
+Download the **Windows x64 ZIP** from [GitHub Releases](https://github.com/qwe7989199/GOP-Composer/releases/latest),
+extract the entire archive, and run `gop-composer.exe`. Keep the bundled DLLs next
+to the executable. No separate FFmpeg installation is needed to run this package.
+The release includes SHA-256 checksums, dependency notices and matching FFmpeg source.
+
 ## At A Glance
 
 | Area | Scope |
@@ -234,8 +241,21 @@ inspection and smoke testing:
 .\target\release\gop-composer.exe --export-gops "input.mkv" "2-3" raw "output.h264"
 .\target\release\gop-composer.exe --export-gops-ordered "input.mkv" "2,1,2" mp4 "output.mp4" --generate-pts
 .\target\release\gop-composer.exe --timecode-map "main.mp4" "replacement_tc.mp4"
-.\scripts\smoke-release.ps1 -MkvSample "sample.mkv" -HevcSample "sample-hevc.mp4"
+.\scripts\smoke-release.ps1
 ```
+
+## Tests
+
+```powershell
+cargo test --release --locked
+cargo clippy --release --locked --all-targets -- -D warnings
+```
+
+Small synthetic H.264, HEVC Main 10 and AAC samples are included in
+[`tests/fixtures`](tests/fixtures). They contain only generated test patterns and
+tones. See [testing instructions](docs/TESTING.md) for regeneration and full
+packet/frame validation, and [release packaging](docs/RELEASING.md) to reproduce
+the Windows archive.
 
 ## Keyboard Shortcuts
 
@@ -252,12 +272,15 @@ inspection and smoke testing:
 
 ```text
 src/app/       Application state and editing workflow
+  export.rs    Export planning, options and background work
+  timeline.rs  GOP drag and move operations
 src/media/     FFmpeg-facing media operations
 src/preview/   Preview worker and GPU upload path
 src/ui/        egui panels, styling, i18n, and window chrome
 native/        C bridge code for FFmpeg and preview interop
 scripts/       Build and smoke-test helpers
-docs/          Open-source preparation notes
+tests/         CLI regression tests and synthetic media fixtures
+docs/          Testing, packaging and project notes
 ```
 
 ## Platform Status

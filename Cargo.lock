@@ -1383,6 +1383,8 @@ dependencies = [
  "eframe",
  "raw-window-handle",
  "rfd",
+ "same-file",
+ "tempfile",
  "winresource",
 ]
 

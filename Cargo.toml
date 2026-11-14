@@ -5,12 +5,15 @@ edition = "2024"
 build = "build.rs"
 description = "Local GOP-level replacement and remuxing tool for H.264/HEVC delivery streams"
 license = "MIT"
+repository = "https://github.com/qwe7989199/GOP-Composer"
 publish = false
 
 [dependencies]
 eframe = "0.31.1"
 raw-window-handle = "0.6.2"
 rfd = "0.15.4"
+same-file = "1.0.6"
+tempfile = "3.27.0"
 
 [build-dependencies]
 cc = "1.2.62"

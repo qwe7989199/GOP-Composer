@@ -152,6 +152,13 @@ MP4 导出：
 ProRes 这类不在范围内的编辑目标会被有意拒绝。GOP Composer 不是通用 NLE，也不做
 任意帧级剪辑。
 
+## 下载 Windows 版本
+
+在 [GitHub Releases](https://github.com/qwe7989199/GOP-Composer/releases/latest)
+下载 **Windows x64 ZIP**，完整解压后运行 `gop-composer.exe`。请保留同目录的 DLL；
+运行发布包不需要另外安装 FFmpeg。Release 同时提供 SHA-256 校验值、依赖许可说明
+和对应版本的 FFmpeg 源码。
+
 ## 从源码构建
 
 这个 Rust 项目始终使用 release 构建：
@@ -214,8 +221,20 @@ GUI 是主要入口，但项目也提供一些用于检查和 smoke test 的 CLI
 .\target\release\gop-composer.exe --export-gops "input.mkv" "2-3" raw "output.h264"
 .\target\release\gop-composer.exe --export-gops-ordered "input.mkv" "2,1,2" mp4 "output.mp4" --generate-pts
 .\target\release\gop-composer.exe --timecode-map "main.mp4" "replacement_tc.mp4"
-.\scripts\smoke-release.ps1 -MkvSample "sample.mkv" -HevcSample "sample-hevc.mp4"
+.\scripts\smoke-release.ps1
 ```
+
+## 测试
+
+```powershell
+cargo test --release --locked
+cargo clippy --release --locked --all-targets -- -D warnings
+```
+
+[`tests/fixtures`](tests/fixtures) 内置小型 H.264、HEVC Main 10 和 AAC 样片，
+全部为程序生成的测试图案和音调，不含私人或客户素材。
+素材生成及压缩包、解码画面校验方式见[测试说明](docs/TESTING.md)；
+Windows 打包方式见[发布说明](docs/RELEASING.md)。
 
 ## 快捷键
 
@@ -232,12 +251,15 @@ GUI 是主要入口，但项目也提供一些用于检查和 smoke test 的 CLI
 
 ```text
 src/app/       应用状态和编辑工作流
+  export.rs    导出计划、选项和后台任务
+  timeline.rs  GOP 拖动和移动操作
 src/media/     FFmpeg 相关媒体操作
 src/preview/   预览 worker 和 GPU 上传路径
 src/ui/        egui 面板、样式、i18n 和自绘窗口栏
 native/        FFmpeg 和预览互操作的 C bridge
 scripts/       构建和 smoke test 脚本
-docs/          开源准备记录
+tests/         CLI 回归测试和合成媒体素材
+docs/          测试、打包和项目说明
 ```
 
 ## 平台状态

@@ -2,6 +2,7 @@ use std::path::Path;
 
 use super::{
     ffi,
+    output::ExportOutput,
     types::{ExportKind, ExportOptions, ExportSegment, ExportSummary, PacketRange},
 };
 
@@ -34,7 +35,9 @@ pub fn export_video_ranges(
     }
 
     let (_input_text, input) = ffi::path_to_cstring(input_path)?;
-    let (output_text, output) = ffi::path_to_cstring(output_path)?;
+    let staged = ExportOutput::new(output_path, [input_path])?;
+    let (output_text, _) = ffi::path_to_cstring(output_path)?;
+    let (_, output) = ffi::path_to_cstring(staged.path())?;
     let raw_ranges = ranges
         .iter()
         .map(|range| ffi::GcPacketRange {
@@ -59,7 +62,9 @@ pub fn export_video_ranges(
     unsafe {
         ffi::gopcomposer_free_export(&mut raw);
     }
-    result
+    let summary = result?;
+    staged.finish()?;
+    Ok(summary)
 }
 
 pub fn export_video_segments(
@@ -72,7 +77,9 @@ pub fn export_video_segments(
         return Err("export requires at least one segment".to_owned());
     }
 
-    let (output_text, output) = ffi::path_to_cstring(output_path)?;
+    let staged = ExportOutput::new(output_path, segments.iter().map(|s| s.input_path.as_path()))?;
+    let (output_text, _) = ffi::path_to_cstring(output_path)?;
+    let (_, output) = ffi::path_to_cstring(staged.path())?;
     let mut input_paths = Vec::with_capacity(segments.len());
     for segment in segments {
         input_paths.push(ffi::path_to_cstring(&segment.input_path)?.1);
@@ -112,7 +119,9 @@ pub fn export_video_segments(
     unsafe {
         ffi::gopcomposer_free_export(&mut raw);
     }
-    result
+    let summary = result?;
+    staged.finish()?;
+    Ok(summary)
 }
 
 fn export_result_from_raw(

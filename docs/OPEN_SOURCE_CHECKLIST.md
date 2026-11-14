@@ -1,19 +1,16 @@
 # Open Source Checklist
 
-This checklist tracks what should be settled before making GOP Composer public.
+GOP Composer is public. This document tracks follow-up work after the first release.
 
-## Required before public release
+## Completed for the first public release
 
-- Choose a license and add `LICENSE`.
-- Add repository URL and license metadata to `Cargo.toml`.
-- Confirm that no personal paths, private sample names, or local-only paths are
-  documented as defaults.
-- Keep `target/` and `vendor/` out of git.
-- Decide whether to publish prebuilt FFmpeg DLLs, publish a separate binary
-  release, or require users to run the FFmpeg build script.
-- Add at least one screenshot or short demo GIF.
-- Add a short disclaimer that exported files should be validated before
-  production delivery.
+- MIT license and repository metadata in `Cargo.toml`.
+- `target/` and `vendor/` excluded from git.
+- Synthetic test fixtures with documented provenance and hashes.
+- Automated export, preview, timeline and CLI regression tests.
+- Windows x64 packaging with FFmpeg DLLs, dependency notices and matching source.
+- Testing and release instructions in [TESTING.md](TESTING.md) and
+  [RELEASING.md](RELEASING.md).
 
 ## Good first public issues
 
@@ -22,7 +19,8 @@ This checklist tracks what should be settled before making GOP Composer public.
 - Linux preview and hardware decode path.
 - More detailed stream compatibility reporting.
 - Export report with source GOP mapping and timestamp mode.
-- Automated mux regression tests with small synthetic H.264/HEVC samples.
+- Broader audio synchronization, open-GOP and variable-frame-rate fixtures.
+- CI across supported operating systems and representative GPU hardware.
 
 ## Release artifact notes
 
@@ -33,8 +31,11 @@ For Windows releases, include:
 - `avformat-*.dll`
 - `avutil-*.dll`
 - `swscale-*.dll`
+- `vcruntime140.dll` from the official Visual Studio x64 Redist directory
+- Dependency licenses and notices
 
-Do not include FFmpeg source or build trees in the application archive.
+Provide the matching FFmpeg source as a separate release artifact. Keep build
+trees and development SDKs out of the application archive.
 
 ## Documentation still needed
 
@@ -42,3 +43,4 @@ Do not include FFmpeg source or build trees in the application archive.
 - A compatibility guide explaining codec parameters, extradata, timebase, and
   GOP boundaries.
 - A troubleshooting page for mux errors and preview hardware decode failures.
+- A screenshot or short demo GIF made using the synthetic fixtures.

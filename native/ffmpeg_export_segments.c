@@ -188,12 +188,8 @@ static void gc_update_mux_state_after_packet(AVPacket *packet, GcMuxStreamState 
             state->next_output_offset = end;
         }
     }
-    if (packet->pts != AV_NOPTS_VALUE) {
-        int64_t end = packet->pts + duration;
-        if (end > state->next_output_offset) {
-            state->next_output_offset = end;
-        }
-    }
+    /* The next segment continues the decode clock. PTS already includes the
+       B-frame reorder delay; using its maximum adds that delay at every cut. */
 }
 
 static int gc_open_export_input(const char *path, AVFormatContext **format_out, int *video_stream_out) {
@@ -648,7 +644,10 @@ mux_cleanup:
     }
     if (!(output_format->oformat->flags & AVFMT_NOFILE) && output_format->pb) {
         result->bytes_written = avio_tell(output_format->pb);
-        avio_closep(&output_format->pb);
+        int close_ret = avio_closep(&output_format->pb);
+        if (ret >= 0 && close_ret < 0) {
+            ret = close_ret;
+        }
     }
 
 setup_cleanup:

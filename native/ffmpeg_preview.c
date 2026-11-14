@@ -1,4 +1,5 @@
 #include "ffmpeg_bridge.h"
+#include <libavutil/pixdesc.h>
 
 #if defined(GOPCOMPOSER_TARGET_WINDOWS)
 #include <windows.h>
@@ -48,16 +49,24 @@ static void gc_set_window_error(GcRgbaWindow *result, const char *prefix, int co
 
 static enum AVPixelFormat gc_hw_get_format(AVCodecContext *codec, const enum AVPixelFormat *formats) {
     GcDecoderHw *hw = (GcDecoderHw *)codec->opaque;
-    if (!hw) {
-        return formats[0];
-    }
-
     for (const enum AVPixelFormat *format = formats; *format != AV_PIX_FMT_NONE; format++) {
-        if (*format == hw->pix_fmt) {
+        if (hw && *format == hw->pix_fmt) {
             return *format;
         }
     }
-    return formats[0];
+    /* FFmpeg calls get_format again without a hardware format if its setup
+       failed. Never select another device's format with the old device context. */
+    for (const enum AVPixelFormat *format = formats; *format != AV_PIX_FMT_NONE; format++) {
+        const AVPixFmtDescriptor *descriptor = av_pix_fmt_desc_get(*format);
+        if (descriptor && !(descriptor->flags & AV_PIX_FMT_FLAG_HWACCEL)) {
+            if (hw) {
+                hw->pix_fmt = AV_PIX_FMT_NONE;
+                hw->name = NULL;
+            }
+            return *format;
+        }
+    }
+    return AV_PIX_FMT_NONE;
 }
 
 static void gc_configure_decoder_threads(AVCodecContext *codec) {

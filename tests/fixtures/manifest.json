@@ -1,0 +1,26 @@
+{
+  "generator": "ffmpeg version N-121656-g222127418b-20251106 Copyright (c) 2000-2025 the FFmpeg developers",
+  "source": "FFmpeg lavfi testsrc2 and sine; no external media",
+  "files": [
+    {
+      "name": "h264-audio.mkv",
+      "bytes": 83212,
+      "sha256": "ae61a536ec564ee975183b779c8bdad19a5618e7eec2832b9c89a7717d5aaa24"
+    },
+    {
+      "name": "h264-main.mp4",
+      "bytes": 84400,
+      "sha256": "17c25bcd04aab3cbadb34c5f5a63bf4e6a83eb766774a1d23a755f071a4482cc"
+    },
+    {
+      "name": "h264-replacement.mp4",
+      "bytes": 19492,
+      "sha256": "0f5fa3ccff4ff4f851717671ed0b8df366df1b31a8c0284e337f6d1b2e6eabab"
+    },
+    {
+      "name": "hevc-main10.mp4",
+      "bytes": 32384,
+      "sha256": "90c54b49f51baffd8ecd47c869f70bf2f8285bf7bd83372fbce6f2a122d9c945"
+    }
+  ]
+}
